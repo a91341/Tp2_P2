@@ -1,10 +1,7 @@
-# gomoku.py (template)
-"""
-Template para implementar o jogo Gomoku (Cinco em Linha).
-Deve implementar todos os métodos abstratos herdados de Jogo.
-"""
+"""Implementação do jogo Gomoku (5 em linha)"""
 
 from jogo_abs import Jogo
+import random
 
 
 class Gomoku(Jogo):
@@ -19,21 +16,36 @@ class Gomoku(Jogo):
         self.tabuleiro = [[' ' for _ in range(10)] for _ in range(10)]
 
     def mostra_tabuleiro(self) -> None:
-        """
-        Desenha o tabuleiro na consola.
-        Dica: Pode usar enumerate() para numerar as linhas.
-        """
-        raise NotImplementedError("Implementar este método")
+        """ Exibe o tabuleiro na consola. """
+        print("\n " + " ".join(str(i) for i in range (10)))
+
+        for i, linha in enumerate(self.tabuleiro):
+            print(f"{i:2}" + " |".join(linha))
+            if i < 9:
+                print("  " + "-" * 19)
 
     def joga_humano(self, jogador: int) -> None:
-        """
-        Pede ao jogador humano as coordenadas (linha, coluna) da jogada
-        e coloca a peça no tabuleiro.
-        - Jogador 0 usa 'O', Jogador 1 usa 'X'.
-        - Deve validar se a posição está dentro do tabuleiro e está livre.
-        :param jogador: número do jogador (0 ou 1).
-        """
-        raise NotImplementedError("Implementar este método")
+        """ Jogada do jogador himano """
+
+        simbolo = "O" if jogador == 0 else "X"
+
+        while True:
+            try:
+                linha = int(input("Linha (0-9): "))
+                coluna = int(input("Coluna (0-9): "))
+                if linha < 0 or linha > 9 or coluna < 0 or coluna > 9:
+                    print("Posição fora do tabuleiro. Tente novamente.")
+                    continue
+
+                if self.tabuleiro[linha][coluna] != ' ':
+                    print("Posição já ocupada. Tente novamente.")
+                    continue
+
+                self.tabuleiro[linha][coluna] = simbolo
+                break
+            except ValueError:
+                print("Entrada inválida. Digite números entre 0 e 9. Tente novamente.") 
+
 
     def joga_computador(self, jogador: int) -> None:
         """
