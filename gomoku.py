@@ -5,14 +5,10 @@ import random
 
 
 class Gomoku(Jogo):
-    """
-    Classe concreta que herda da classe Jogo e implementa o jogo Gomoku.
-    """
+    """ Classe concreta que herda da classe Jogo e implementa o jogo Gomoku."""
 
     def inicializa_tabuleiro(self) -> None:
-        """
-        Inicializa o tabuleiro 10x10 com espaços vazios ' '.
-        """
+        """ Inicializa o tabuleiro 10x10 com espaços vazios ' '. """
         self.tabuleiro = [[' ' for _ in range(10)] for _ in range(10)]
 
     def mostra_tabuleiro(self) -> None:
@@ -25,7 +21,7 @@ class Gomoku(Jogo):
                 print("  " + "-" * 19)
 
     def joga_humano(self, jogador: int) -> None:
-        """ Jogada do jogador himano """
+        """ Jogada do jogador humano. """
 
         simbolo = "O" if jogador == 0 else "X"
 
@@ -48,24 +44,65 @@ class Gomoku(Jogo):
 
 
     def joga_computador(self, jogador: int) -> None:
-        """
-        Realiza uma jogada aleatória do computador numa posição livre.
-        - Jogador 0 usa 'O', Jogador 1 usa 'X'.
-        :param jogador: número do jogador (computador).
-        """
-        raise NotImplementedError("Implementar este método")
+        """ Jogada aleatória do computador """
+        
+        simbolo = "O" if jogador == 0 else "X"
+        
+        livres = []
+
+        for i in range(10):
+            for j in range(10):
+                if self.tabuleiro[i][j] == ' ':
+                    livres.append((i, j))
+
+        linha, coluna = random.choice(livres)
+
+        self.tabuleiro[linha][coluna] = simbolo
 
     def ha_jogadas_possiveis(self) -> bool:
-        """
-        Verifica se ainda há espaços vazios no tabuleiro.
-        :return: True se ainda há jogadas possíveis, False caso contrário.
-        """
-        raise NotImplementedError("Implementar este método")
+        """ Verifica se ainda há espaços vazios no tabuleiro."""
+        
+        for linha in self.tabuleiro:
+            if ' ' in linha:
+                return True
+        return False
 
     def terminou(self) -> bool:
-        """
-        Verifica se alguém ganhou (5 peças seguidas em qualquer direção:
-        horizontal, vertical, diagonal ↘️, diagonal ↗️).
-        :return: True se o jogo terminou (alguém ganhou), False caso contrário.
-        """
-        raise NotImplementedError("Implementar este método")
+        """ Verifica se existe 5 em linha """
+        
+        tamanho = 10 
+        direcoes = [
+            (0, 1),   # horizontal
+            (1, 0),   # vertical
+            (1, 1),   # diagonal descendo
+            (1, -1)   # diagonal subindo
+        ]
+
+        for i in range(tamanho):
+            for j in range(tamanho):
+
+                simbolo = self.tabuleiro[i][j]
+                
+                if simbolo == ' ':
+                    continue
+
+                for dx, dy in direcoes:
+
+                    contador = 0
+
+                    for k in range(5):
+                        x = i + dx * k
+                        y = j + dy * k
+
+                        if 0 <= x < tamanho and 0 <= y < tamanho:
+                            if self.tabuleiro[x][y] == simbolo:
+                                contador += 1
+                            else:
+                                break
+                        else:
+                            break
+
+                    if contador == 5:
+                        return True 
+                    
+        return False
