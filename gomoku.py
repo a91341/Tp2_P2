@@ -44,9 +44,11 @@ class Gomoku(Jogo):
 
 
     def joga_computador(self, jogador: int) -> None:
-        """ Jogada aleatória do computador """
+        """ Jogada do computador. 
+        O computador tenta jogar de forma inteligente, seguindo uma estratégia simples."""
         
         simbolo = "O" if jogador == 0 else "X"
+        adversario = "X" if simbolo == "O" else "O"
         
         livres = []
 
@@ -55,9 +57,30 @@ class Gomoku(Jogo):
                 if self.tabuleiro[i][j] == ' ':
                     livres.append((i, j))
 
-        linha, coluna = random.choice(livres)
 
-        self.tabuleiro[linha][coluna] = simbolo
+        # Primeiro, verifica se há uma jogada vencedora para o computador
+        for i, j in livres:
+            if self.jogada_win(i, j, simbolo):
+                self.tabuleiro[i][j] = simbolo
+                return
+            
+        # Segundo, verifica se o oponente tem uma jogada vencedora e bloqueia
+        for i, j in livres:
+            if self.jogada_win(i, j, "O" if simbolo == "X" else "X"):
+                self.tabuleiro[i][j] = simbolo
+                return
+        
+        # Terceiro, tenta jogar próximo a uma peça já colocada.
+        possivel = [(i,j) for i, j in livres if self.tem_vizinho(i, j)]
+                    
+        if possivel:
+            i, j = random.choice(possivel)
+            self.tabuleiro[i][j] = simbolo
+            return
+        
+        # Quarto, joga aleatoriamente.
+        i, j = random.choice(livres)
+        self.tabuleiro[i][j] = simbolo
 
     def ha_jogadas_possiveis(self) -> bool:
         """ Verifica se ainda há espaços vazios no tabuleiro."""
@@ -66,6 +89,50 @@ class Gomoku(Jogo):
             if ' ' in linha:
                 return True
         return False
+    
+    def contar_linhas(self, linha, coluna, dx, dy, simnolo):
+
+        contador = 0
+
+        for k in range(5):
+            x = linha + dx * k
+            y = coluna + dy * k
+
+            if 0 <= x < 10 and 0 <= y < 10:
+                if self.tabuleiro[x][y] == simnolo:
+                    contador += 1
+                else:
+                    break
+            else:
+                break
+
+        return contador
+    
+    def tem_vizinho(self, linha, coluna):
+
+        for dx in range(-1, 0, 1):
+            for dy in range(-1, 0, 1):
+                if dx == 0 and dy == 0:
+                    continue
+
+                x = linha + dx
+                y = coluna + dy
+
+                if 0 <= x < 10 and 0 <= y < 10:
+                    if self.tabuleiro[x][y] != ' ':
+                        return True
+
+        return False
+    
+    def jogada_win(self, linha, coluna, simbolo):
+
+        self.tabuleiro[linha][coluna] = simbolo
+
+        ganhou = self.terminou()
+
+        self.tabuleiro[linha][coluna] = ' '
+
+        return ganhou
 
     def terminou(self) -> bool:
         """ Verifica se existe 5 em linha """
